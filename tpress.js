@@ -6,7 +6,7 @@ glob = require("glob");
 Q = require("q");
 
 function get_files(glob_pattern) {
-  deferred = Q.defer();
+  var deferred = Q.defer();
   glob(glob_pattern, {}, function(er, files) {
     deferred.resolve(files);
   });
@@ -23,9 +23,18 @@ function read_files(files) {
 }
 
 function main(argc, argv) {
-  get_files(argv[2]).done(function(files) {
-    file_data = read_files(files);
-    console.log(JSON.stringify(file_data));
+  var globs = argv.slice(2);
+  var files = [];
+
+  var get_files_promises = _.map(globs, function(glob) {
+    return get_files(glob);
+  });
+  Q.all(get_files_promises).done(function(get_files_results) {
+    var files_data = {};
+    _.each(get_files_results, function(files) {
+      _.extend(files_data, read_files(files));
+    });
+    console.log(JSON.stringify(files_data));
   });
 }
 
