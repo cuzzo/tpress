@@ -23,7 +23,6 @@ function read_files(files) {
 }
 
 function main(argc, argv) {
-  console.log(argv[2]);
   get_files(argv[2]).done(function(files) {
     file_data = read_files(files);
     console.log(JSON.stringify(file_data));
