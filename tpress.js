@@ -4,6 +4,26 @@ fs = require("fs");
 _ = require("underscore");
 glob = require("glob");
 Q = require("q");
+cssmin = require("cssmin");
+htmlmin = require("html-minifier").minify;
+
+var htmlmin_options = {
+  removeComments: true,
+  removeCDATASectionsFromCDATA: true,
+  removeEmptyAttributes: true,
+  cleanAttributes: true,
+  collapseWhitespace: true
+};
+
+function compress(data, file) {
+  if (file.match(/\.html?$/)) {
+    return htmlmin(data, htmlmin_options);
+  }
+  if (file.match(/\.css$/)) {
+    return cssmin(data);
+  }
+  return data;
+}
 
 function get_files(glob_pattern) {
   var deferred = Q.defer();
@@ -17,7 +37,7 @@ function read_files(files) {
   var file_data = {};
   _.each(files, function(file) {
     var data = fs.readFileSync(file, "utf8");
-    file_data[file] = data;
+    file_data[file] = compress(data, file);
   });
   return file_data;
 }
