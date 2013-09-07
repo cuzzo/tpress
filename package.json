@@ -10,6 +10,11 @@
     "type": "git",
     "url": "git://github.com/cuzzo/tpress.git"
   },
+  "main": "tpress.js",
+  "engines": {
+    "node": "*"
+  },
+  "license": "BSD",
   "dependencies": {
     "underscore": "~1.5.1",
     "glob": "~3.2.6",
