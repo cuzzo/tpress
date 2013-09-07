@@ -6,6 +6,6 @@
     "glob": "~3.2.6",
     "q": "~0.9.7",
     "cssmin": "~0.4.1",
-    "html-minifer": "~0.5.4"
+    "html-minifier": "~0.5.4"
   }
 }
