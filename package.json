@@ -1,11 +1,24 @@
 {
   "name": "tpress",
+  "description": "A template and CSS compressor for requirejs",
   "version": "0.0.1",
+  "author": {
+    "name": "Cuzzo",
+    "url": "http://github.com/cuzzo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cuzzo/tpress.git"
+  },
   "dependencies": {
     "underscore": "~1.5.1",
     "glob": "~3.2.6",
     "q": "~0.9.7",
     "cssmin": "~0.4.1",
     "html-minifier": "~0.5.4"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.7"
   }
 }

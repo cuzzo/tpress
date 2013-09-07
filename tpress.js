@@ -42,22 +42,37 @@ function read_files(files) {
   return file_data;
 }
 
-function main(argc, argv) {
-  var globs = argv.slice(2);
-  var files = [];
 
+function press_glob_results(get_files_results) {
+  var files_data = {};
+  _.each(get_files_results, function(files) {
+    _.extend(files_data, read_files(files));
+  });
+  return JSON.stringify(files_data);
+}
+
+function get_glob_promise(globs) {
+  var files = [];
   var get_files_promises = _.map(globs, function(glob) {
     return get_files(glob);
   });
-  Q.all(get_files_promises).done(function(get_files_results) {
-    var files_data = {};
-    _.each(get_files_results, function(files) {
-      _.extend(files_data, read_files(files));
-    });
-    console.log(JSON.stringify(files_data));
+  return Q.all(get_files_promises);
+}
+
+function main(argc, argv) {
+  var globs = argv.slice(2);
+  var glob_promises = get_glob_promise(globs);
+  glob_promise.done(function(glob_results) {
+    var json = press_glob_results(glob_results);
+    console.log(json);
   });
 }
 
 if (require.main === module) {
   main(process.argv.length, process.argv);
 }
+
+module.exports = {
+  get_glob_promise: get_glob_promise,
+  press_glob_results: press_glob_results
+};
