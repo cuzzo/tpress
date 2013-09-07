@@ -1,67 +1,50 @@
 define([
-  'text!' + requirejs.s.contexts._.config.tpress_uri
+  "text!" + requirejs.s.contexts._.config.tpress.uri
 ], function(pressed_json) {
+  var pressed = JSON.parse(pressed_json);
 
-  pressed = JSON.parse(pressed_json);
-
-  var injected_csses = {};
-
-
-  function css_inject(name, css) {
-    if (name in injected_csses) {
-      return false;
-    }
-
-    var head = document.getElementsByTagName("head")[0];
-    var style = document.createElement("style");
-
-    style.type = "text/css";
-    if (style.styleSheet) {
-      style.styleSheet.cssText = css;
-    }
-    else {
-      style.appendChild(document.createTextNode(css));
-    }
-
-    head.appendChild(style);
-    injected_csses[name] = true;
-    return true;
-  }
-
-  function clean(name) {
+  function clean(name, tpress_settings) {
     var options = {};
-    if (name.match(/!css$/g, "")) {
-      options.name = name.replace(/!css$/g, "");
-      options.type = "css";
+    for (var type in tpress_settings.type_map) {
+      var regex = new RegExp("!" + type + "$", "g");
+      if (name.match(regex)) {
+        return {
+          name: name.replace(regex, ""),
+          type: tpress_settings.type_map[type]
+        };
+      }
     }
-    else {
-      options.name = name;
-      options.type = "html";
-    }
-    return options;
+    return {
+      name: name,
+      type: ""
+    };
   }
 
-  function finalize(file, text, onLoad) {
-    switch (file.type) {
-      case "css":
-        css_inject(file.name, text);
-        onLoad(true);
-        break;
-      default:
-        onLoad(text);
+  function finalize(file, text, onLoad, tpress_settings) {
+    var backends = tpress_settings.backends;
+    if (file.type in backends) {
+      require([backends[file.type] + "!"], function(callback) {
+        var result = callback(file.name, text);
+        onLoad(result);
+        return true;
+      });
+    }
+    else {
+      onLoad(text);
+      return true;
     }
   }
 
   return {
-    load: function (name, require, onLoad, config) {
-      var file = clean(name);
+    load: function(name, require, onLoad, config) {
+      var file = clean(name, config.tpress);
 
       if (file.name in pressed) {
-        finalize(file, pressed[file.name], onLoad);
+        finalize(file, pressed[file.name], onLoad, config.tpress);
       }
       else {
         require(['text!' + file.name], function(text) {
-          finalize(file, text, onLoad);
+          finalize(file, text, onLoad, config.tpress);
         });
       }
     }
