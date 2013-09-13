@@ -1,9 +1,12 @@
 define([
   "text!" + requirejs.s.contexts._.config.tpress.uri
 ], function(pressed_json) {
-  var pressed = JSON.parse(pressed_json);
+  var pressed = {};
+  if (pressed_json) {
+    pressed = JSON.parse(pressed_json);
+  }
 
-  function clean(name, tpress_settings) {
+  function parse(name, tpress_settings) {
     var options = {};
     for (var type in tpress_settings.type_map) {
       var regex = new RegExp("!" + type + "$", "g");
@@ -37,7 +40,12 @@ define([
 
   return {
     load: function(name, require, onLoad, config) {
-      var file = clean(name, config.tpress);
+      if (config.isBuild) {
+        onLoad();
+        return;
+      }
+
+      var file = parse(name, config.tpress);
 
       if (file.name in pressed) {
         finalize(file, pressed[file.name], onLoad, config.tpress);
