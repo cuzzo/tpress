@@ -9,11 +9,13 @@ module.exports = function(grunt) {
     var done = this.async();
 
     var glob_promise = tpress.get_glob_promise(options.globs);
+    var min_options = options.min;
 
     glob_promise.done(function(glob_results) {
-      var json = tpress.press_glob_results(glob_results);
-      fs.writeFile(options.output, json);
-      done();
+      var json = tpress.press_glob_results(glob_results, min_options);
+      fs.writeFile(options.output, json, function() {
+        done();
+      });
     });
   });
 };

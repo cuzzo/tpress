@@ -7,6 +7,9 @@ Q = require("q");
 cssmin = require("cssmin");
 htmlmin = require("html-minifier").minify;
 
+/**
+ * TODO: Add options to main().
+ */
 var htmlmin_options = {
   removeComments: true,
   removeCDATASectionsFromCDATA: true,
@@ -15,9 +18,9 @@ var htmlmin_options = {
   collapseWhitespace: true
 };
 
-function compress(data, file) {
+function compress(data, file, min_options) {
   if (file.match(/\.html?$/)) {
-    return htmlmin(data, htmlmin_options);
+    return htmlmin(data, min_options.html);
   }
   if (file.match(/\.css$/)) {
     return cssmin(data);
@@ -33,20 +36,20 @@ function get_files(glob_pattern) {
   return deferred.promise;
 }
 
-function read_files(files) {
+function read_files(files, min_options) {
   var file_data = {};
   _.each(files, function(file) {
     var data = fs.readFileSync(file, "utf8");
-    file_data[file] = compress(data, file);
+    file_data[file] = compress(data, file, min_options);
   });
   return file_data;
 }
 
 
-function press_glob_results(get_files_results) {
+function press_glob_results(get_files_results, min_options) {
   var files_data = {};
   _.each(get_files_results, function(files) {
-    _.extend(files_data, read_files(files));
+    _.extend(files_data, read_files(files, min_options));
   });
   return JSON.stringify(files_data);
 }
@@ -62,8 +65,10 @@ function get_glob_promise(globs) {
 function main(argc, argv) {
   var globs = argv.slice(2);
   var glob_promises = get_glob_promise(globs);
-  glob_promise.done(function(glob_results) {
-    var json = press_glob_results(glob_results);
+  glob_promises.done(function(glob_results) {
+    var json = press_glob_results(glob_results, {
+      html: htmlmin_options
+    });
     console.log(json);
   });
 }

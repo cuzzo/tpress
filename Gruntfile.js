@@ -6,7 +6,16 @@ module.exports = function(grunt) {
     tpress: {
       options: {
         globs: ["tpl/**/*.html", "css/**/*.css"],
-        output: "tp.json"
+        output: "tp.json",
+        min: {
+          html: {
+            removeComments: true,
+            removeCDATASectionsFromCDATA: true,
+            removeEmptyAttributes: true,
+            cleanAttributes: true,
+            collapseWhitespace: true
+          }
+        }
       }
     }
   });
