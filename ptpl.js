@@ -102,7 +102,7 @@ define([], function(pressed_json) {
        */
       if (_pressed === null) {
         require([
-          "text!" + requirejs.s.contexts._.config.tpress.uri
+          "text!" + config.tpress.uri
         ], function(pressed_json) {
           unpress(pressed_json);
           load_file(name, onLoad, config.tpress);
