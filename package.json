@@ -1,7 +1,7 @@
 {
   "name": "tpress",
   "description": "A template and CSS compressor for requirejs",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": {
     "name": "Cuzzo",
     "url": "http://github.com/cuzzo"
