@@ -16,6 +16,7 @@
   },
   "license": "BSD",
   "dependencies": {
+    "mkdirp": "~0.3.5",
     "underscore": "~1.5.1",
     "glob": "~3.2.6",
     "q": "~0.9.7",
