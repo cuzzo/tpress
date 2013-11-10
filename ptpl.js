@@ -1,6 +1,27 @@
-define([], function(pressed_json) {
+define([], function() {
+  "use strict";
+
   // Holds the entire contents of all compressed files--indexed by file path.
   var _pressed = null;
+
+  var require_config = {};
+
+  /**
+   * Escapes plaintext for javascript.
+   *
+   * Stolen form requirejs text plugin.
+   */
+  function js_escape(content) {
+    return content.replace(/(['\\])/g, '\\$1')
+                  .replace(/[\f]/g, "\\f")
+                  .replace(/[\b]/g, "\\b")
+                  .replace(/[\n]/g, "\\n")
+                  .replace(/[\t]/g, "\\t")
+                  .replace(/[\r]/g, "\\r")
+                  .replace(/[\u2028]/g, "\\u2028")
+                  .replace(/[\u2029]/g, "\\u2029");
+  }
+
 
   /**
    * Deserializes the loaded file into an object.
@@ -93,6 +114,7 @@ define([], function(pressed_json) {
   return {
     load: function(name, require, onLoad, config) {
       if (config.isBuild) {
+        require_config = config;
         onLoad();
         return;
       }
@@ -111,6 +133,13 @@ define([], function(pressed_json) {
       else {
         load_file(name, onLoad, config.tpress);
       }
+    },
+    write: function(pluginName, moduleName, write) {
+      var uri = require_config.tpress.uri;
+      var fs = require.nodeRequire("fs");
+      var tpressed = js_escape(fs.readFileSync(uri, "utf8"));
+      write.asModule("text!" + uri,
+          "define(function() { return '" + tpressed + "';});\n");
     }
   };
 });
