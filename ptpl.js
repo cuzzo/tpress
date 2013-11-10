@@ -135,6 +135,9 @@ define([], function() {
       }
     },
     write: function(pluginName, moduleName, write) {
+      if (require_config.tpress.inline !== true) {
+        return;
+      }
       var uri = require_config.tpress.uri;
       var fs = require.nodeRequire("fs");
       var tpressed = js_escape(fs.readFileSync(uri, "utf8"));
