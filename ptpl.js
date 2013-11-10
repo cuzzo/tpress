@@ -4,6 +4,7 @@ define([], function() {
   // Holds the entire contents of all compressed files--indexed by file path.
   var _pressed = null;
 
+  var inlined = false;
   var require_config = {};
 
   /**
@@ -123,9 +124,9 @@ define([], function() {
        * If _pressed is not yet loaded, load it and then load the desired file.
        */
       if (_pressed === null) {
-        require([
-          "text!" + config.tpress.uri
-        ], function(pressed_json) {
+        var tpressed = config.tpress.inline ? "tpressed"
+                                            : "text!" + config.tpress.uri;
+        require([tpressed], function(pressed_json) {
           unpress(pressed_json);
           load_file(name, onLoad, config.tpress);
         });
@@ -135,14 +136,15 @@ define([], function() {
       }
     },
     write: function(pluginName, moduleName, write) {
-      if (require_config.tpress.inline !== true) {
+      if (require_config.tpress.inline !== true || inlined === true) {
         return;
       }
+      inlined = true;
       var uri = require_config.tpress.uri;
       var fs = require.nodeRequire("fs");
       var tpressed = js_escape(fs.readFileSync(uri, "utf8"));
-      write.asModule("text!" + uri,
-          "define(function() { return '" + tpressed + "';});\n");
+      write.asModule("tpressed",
+            "define(function () { return '" + tpressed + "';});\n");
     }
   };
 });
